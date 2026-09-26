@@ -318,12 +318,22 @@ int main(int argc, char *argv[]) {
     tradeTimer->start(50);
 
     auto submitOrder = [&](bool isBuy, bool isMarket) {
-        bool okPrice = true, okSize;
-        double price = isMarket ? 0.0 : priceInput->text().toDouble(&okPrice);
+        bool okSize;
         double size = sizeInput->text().toDouble(&okSize);
-        if (!okPrice || !okSize || (!isMarket && price <= 0) || size <= 0) {
-            QMessageBox::warning(&window, "Invalid input", "Enter a valid price and size.");
-            return;
+        double price = 0.0;
+
+        if (isMarket) {
+            if (!okSize || size <= 0) {
+                QMessageBox::warning(&window, "Invalid size", "Enter a valid size for the market order.");
+                return;
+            }
+        } else {
+            bool okPrice;
+            price = priceInput->text().toDouble(&okPrice);
+            if (!okPrice || !okSize || price <= 0 || size <= 0) {
+                QMessageBox::warning(&window, "Invalid input", "Enter a valid price and size.");
+                return;
+            }
         }
 
         int id = nextOrderId++;
