@@ -16,6 +16,7 @@ struct MessageOrder {
     double price;
     double quantity;
     Side side;
+    OrderType orderType = OrderType::LIMIT;
 };
 
 struct MessageCancelOrder{

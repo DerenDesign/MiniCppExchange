@@ -104,7 +104,7 @@ private:
             std::memcpy(&msg, data, sizeof(MessageOrder));
 
             std::cout << "[Session] Processing AddOrder for order " << msg.orderId << std::endl;
-            Order order{msg.orderId, msg.price, msg.quantity, msg.side};
+            Order order{msg.orderId, msg.price, msg.quantity, msg.side, msg.orderType};
             auto trades = engine_.submitOrder(order);
 
             std::cout << "[Session] Order " << msg.orderId << " produced " << trades.size() << " trade(s)" << std::endl;

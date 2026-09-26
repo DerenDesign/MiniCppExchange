@@ -6,6 +6,11 @@ enum class Side {
     SELL
 };
 
+enum class OrderType {
+    LIMIT,
+    MARKET
+};
+
 
 struct Order {
 
@@ -13,5 +18,6 @@ struct Order {
     double price;
     double quantity; //Fractional shares allowed (Most brokerages allow this since 2020)
     Side side;
+    OrderType type = OrderType::LIMIT;
 
 };

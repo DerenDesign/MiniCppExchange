@@ -62,8 +62,12 @@ int main(int argc, char *argv[]) {
     sizeInput->setPlaceholderText("Size");
     QPushButton *buyButton = new QPushButton("Buy", &window);
     QPushButton *sellButton = new QPushButton("Sell", &window);
+    QPushButton *buyMarketButton = new QPushButton("Buy Market (Best Ask)", &window);
+    QPushButton *sellMarketButton = new QPushButton("Sell Market (Best Bid)", &window);
     buyButton->setStyleSheet("background-color:#2ecc71; color:white; font-weight:bold;");
     sellButton->setStyleSheet("background-color:#e74c3c; color:white; font-weight:bold;");
+    buyMarketButton->setStyleSheet("background-color:#27ae60; color:white; font-weight:bold;");
+    sellMarketButton->setStyleSheet("background-color:#c0392b; color:white; font-weight:bold;");
 
     QHBoxLayout *entryLayout = new QHBoxLayout();
     entryLayout->addWidget(new QLabel("Price:"));
@@ -72,6 +76,8 @@ int main(int argc, char *argv[]) {
     entryLayout->addWidget(sizeInput);
     entryLayout->addWidget(buyButton);
     entryLayout->addWidget(sellButton);
+    entryLayout->addWidget(buyMarketButton);
+    entryLayout->addWidget(sellMarketButton);
 
     QLineEdit *cancelIdInput = new QLineEdit(&window);
     cancelIdInput->setPlaceholderText("Order ID to cancel");
@@ -311,11 +317,11 @@ int main(int argc, char *argv[]) {
     });
     tradeTimer->start(50);
 
-    auto submitOrder = [&](bool isBuy) {
-        bool okPrice, okSize;
-        double price = priceInput->text().toDouble(&okPrice);
+    auto submitOrder = [&](bool isBuy, bool isMarket) {
+        bool okPrice = true, okSize;
+        double price = isMarket ? 0.0 : priceInput->text().toDouble(&okPrice);
         double size = sizeInput->text().toDouble(&okSize);
-        if (!okPrice || !okSize || price <= 0 || size <= 0) {
+        if (!okPrice || !okSize || (!isMarket && price <= 0) || size <= 0) {
             QMessageBox::warning(&window, "Invalid input", "Enter a valid price and size.");
             return;
         }
@@ -328,25 +334,30 @@ int main(int argc, char *argv[]) {
         msg.price    = price;
         msg.quantity = size;
         msg.side     = isBuy ? Side::BUY : Side::SELL;
+        msg.orderType = isMarket ? OrderType::MARKET : OrderType::LIMIT;
         if (!sendMessage(&msg, sizeof(msg))) {
             return;
         }
 
-        orderIds.push_back(id);
-        orderIsBuy.push_back(isBuy);
-        orderPrices.push_back(price);
-        orderSizes.push_back(size);
-        if (isBuy) bidLevels[price] += size;
-        else       askLevels[price] += size;
-        refreshBook();
-        refreshMyOrders();
+        if (!isMarket) {
+            orderIds.push_back(id);
+            orderIsBuy.push_back(isBuy);
+            orderPrices.push_back(price);
+            orderSizes.push_back(size);
+            if (isBuy) bidLevels[price] += size;
+            else       askLevels[price] += size;
+            refreshBook();
+            refreshMyOrders();
+        }
 
         priceInput->clear();
         sizeInput->clear();
     };
 
-    QObject::connect(buyButton,  &QPushButton::clicked, [&]() { submitOrder(true);  });
-    QObject::connect(sellButton, &QPushButton::clicked, [&]() { submitOrder(false); });
+    QObject::connect(buyButton,  &QPushButton::clicked, [&]() { submitOrder(true, false);  });
+    QObject::connect(sellButton, &QPushButton::clicked, [&]() { submitOrder(false, false); });
+    QObject::connect(buyMarketButton, &QPushButton::clicked, [&]() { submitOrder(true, true); });
+    QObject::connect(sellMarketButton, &QPushButton::clicked, [&]() { submitOrder(false, true); });
 
     QObject::connect(cancelButton, &QPushButton::clicked, [&]() {
         bool ok;

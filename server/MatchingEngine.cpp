@@ -27,8 +27,9 @@ std::vector<Trade> MatchingEngine::match(Order& incomingOrder) {
  
     std::vector<Trade> trades;
     if (incomingOrder.orderId < 0 || incomingOrder.quantity <= 0.0 ||
-        !std::isfinite(incomingOrder.price) || !std::isfinite(incomingOrder.quantity) ||
-        incomingOrder.price <= 0.0 || book_.hasOrder(incomingOrder.orderId)) {
+        !std::isfinite(incomingOrder.quantity) || book_.hasOrder(incomingOrder.orderId) ||
+        (incomingOrder.type == OrderType::LIMIT &&
+         (!std::isfinite(incomingOrder.price) || incomingOrder.price <= 0.0))) {
         return trades;
     }
 
@@ -37,7 +38,8 @@ std::vector<Trade> MatchingEngine::match(Order& incomingOrder) {
         
         
 
-            while(incomingOrder.quantity > 0 && book_.bestAsk() > 0.0 && incomingOrder.price >= book_.bestAsk()) {
+            while(incomingOrder.quantity > 0 && book_.bestAsk() > 0.0 &&
+                (incomingOrder.type == OrderType::MARKET || incomingOrder.price >= book_.bestAsk())) {
 
                 auto& level = book_.asksAt(book_.bestAsk());
 
@@ -77,14 +79,15 @@ std::vector<Trade> MatchingEngine::match(Order& incomingOrder) {
                     book_.removeAskLevel(book_.bestAsk());
                 }
             }
-            if(incomingOrder.quantity > 0){
+            if(incomingOrder.quantity > 0 && incomingOrder.type == OrderType::LIMIT){
                     book_.insertOrder(incomingOrder);
                 }
     }
     else if(side == Side::SELL){
         
 
-            while(incomingOrder.quantity > 0 && book_.bestBid() > 0.0 && incomingOrder.price <= book_.bestBid()) {
+            while(incomingOrder.quantity > 0 && book_.bestBid() > 0.0 &&
+                (incomingOrder.type == OrderType::MARKET || incomingOrder.price <= book_.bestBid())) {
 
                 auto& level = book_.bidsAt(book_.bestBid());
 
@@ -125,7 +128,7 @@ std::vector<Trade> MatchingEngine::match(Order& incomingOrder) {
                 }
 
             }
-            if(incomingOrder.quantity > 0){
+            if(incomingOrder.quantity > 0 && incomingOrder.type == OrderType::LIMIT){
                 book_.insertOrder(incomingOrder);
             }
     }

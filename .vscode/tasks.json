@@ -5,7 +5,7 @@
             "label": "C/C++: g++.exe build unit tests",
             "command": "C:/msys64/ucrt64/bin/g++.exe -fdiagnostics-color=always -std=c++20 -Wall -Wextra -pedantic -g -I. -Icommon -Iserver server/MatchingEngine.cpp server/OrderBook.cpp tests/unit_tests.cpp -o unit_tests.exe",
             "options": {
-                "cwd": "c:/Users/Deren/OneDrive/Desktop/MiniOrderBookCPP/MiniExchangeCpp"
+                "cwd": "c:/Users/Deren/OneDrive/Desktop/cppbook/MiniExchangePublic"
             },
             "problemMatcher": [
                 "$gcc"
@@ -19,9 +19,9 @@
         {
             "type": "shell",
             "label": "Build server",
-            "command": "C:/msys64/ucrt64/bin/g++.exe -fdiagnostics-color=always -std=c++20 -D_WIN32_WINNT=0x0601 -Wall -Wextra -pedantic -g -I. -Icommon -Iserver server/main.cpp server/MatchingEngine.cpp server/OrderBook.cpp -o server.exe -lws2_32 -lmswsock -lwsock32",
+            "command": "C:/msys64/ucrt64/bin/g++.exe -fdiagnostics-color=always -std=c++20 -D_WIN32_WINNT=0x0601 -Wall -Wextra -pedantic -g -I. -Icommon -Iserver -IC:/msys64/ucrt64/include server/main.cpp server/MatchingEngine.cpp server/OrderBook.cpp -o server.exe -lws2_32 -lmswsock -lwsock32",
             "options": {
-                "cwd": "c:/Users/Deren/OneDrive/Desktop/MiniOrderBookCPP/MiniExchangeCpp"
+                "cwd": "c:/Users/Deren/OneDrive/Desktop/cppbook/MiniExchangePublic"
             },
             "problemMatcher": [
                 "$gcc"
@@ -31,9 +31,9 @@
         {
             "type": "shell",
             "label": "Build client",
-            "command": "C:/msys64/ucrt64/bin/g++.exe -fdiagnostics-color=always -std=c++20 -D_WIN32_WINNT=0x0601 -Wall -Wextra -pedantic -g -I. -Icommon -Iserver client/simple_client.cpp server/MatchingEngine.cpp server/OrderBook.cpp -o client.exe -lws2_32 -lmswsock -lwsock32",
+            "command": "C:/msys64/ucrt64/bin/g++.exe -fdiagnostics-color=always -std=c++20 -D_WIN32_WINNT=0x0601 -Wall -Wextra -pedantic -g -I. -Icommon -Iserver -IC:/msys64/ucrt64/include client/simple_client.cpp server/MatchingEngine.cpp server/OrderBook.cpp -o client.exe -lws2_32 -lmswsock -lwsock32",
             "options": {
-                "cwd": "c:/Users/Deren/OneDrive/Desktop/MiniOrderBookCPP/MiniExchangeCpp"
+                "cwd": "c:/Users/Deren/OneDrive/Desktop/cppbook/MiniExchangePublic"
             },
             "problemMatcher": [
                 "$gcc"
